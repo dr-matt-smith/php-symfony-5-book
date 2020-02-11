@@ -82,7 +82,7 @@ Change class `StudentRepository` as follows:
 
     ```php
         use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-        use Symfony\Bridge\Doctrine\RegistryInterface;
+        use Doctrine\Common\Persistence\ManagerRegistry;      
     ```
 
 - make the class extend class `ServiceEntityRepository`
@@ -94,7 +94,7 @@ Change class `StudentRepository` as follows:
 - add a constructor method:
 
     ```php
-        public function __construct(RegistryInterface $registry)
+        public function __construct(ManagerRegistry $registry)
         {
             parent::__construct($registry, Student::class);
         }
@@ -107,11 +107,11 @@ So the full listing for `StudentRepository` is now:
 
     use App\Entity\Student;
     use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-    use Symfony\Bridge\Doctrine\RegistryInterface;
+        public function __construct(ManagerRegistry $registry)
 
     class StudentRepository extends ServiceEntityRepository
     {
-        public function __construct(RegistryInterface $registry)
+        public function __construct(ManagerRegistry $registry)
         {
             parent::__construct($registry, Student::class);
         }
@@ -119,16 +119,21 @@ So the full listing for `StudentRepository` is now:
 ```
 
 
-## Create migrations `diff` file
+## Create a migration (a migration `diff` file)
 
 We now will tell Symfony to create the a PHP class to run SQL migration commands required to change the structure of the existing database to match that of our Entity classes:
 
 ```bash
-    $ php bin/console doctrine:migrations:diff
+    $ php bin/console make:migration
 
-    Generated new migration class to
-    ".../src/Migrations/Version20180213082441.php" from schema differences.
+    Success! 
+    
+    Next: Review the new migration "src/Migrations/Version20180213082441.php"
+    Then: Run the migration with php bin/console doctrine:migrations:migrate
+    See https://symfony.com/doc/current/bundles/DoctrineMigrationsBundle/index.html
 ```
+
+NOTE: This is a shorter way of writing the old `doctrine` command: `php bin/console doctrine:migrations:diff`
 
 A migrations SQL file should have been created in `/src/Migrations/...php`:
 
@@ -260,9 +265,15 @@ Finally we would have had to generate getters and setters for these 2 fields, an
 
 ## Use maker to create properties, annotations and accessor methods! 
 
-However, the (new improved) maker bundle will go further. It will interactively ask you about fields you wish to create, and add the appropriate annotations and accessor (get/set) methods for you!
+We could automatically create our Student entity and StudentRepository classes from scratch, using the `make` package. It will interactively ask you about fields you wish to create, and add the appropriate annotations and accessor (get/set) methods for you!
 
-So this time we won't press `<RETURN>` when asked for the first property name: we'll ask it to create our `firstName` and `surname` text prooperties too:
+If you want to try this, first:
+
+- Delete the entity class: `/src/Entity/Student.php`
+
+- Delete the repository class: `/src/Repository/StudentRepository.php`
+
+Then run the CLI command `make:entity Student`, and at the prompt ask it to create our `firstName` and `surname` text properties (all entities get an auto-incremented `Id` field with us having to ask):
 
 ```bash
     $ php bin/console make:entity Student
@@ -315,7 +326,7 @@ For `string` properties like `firstName` we just need to enter the property name
       * float
     
     Relationships / Associations
-      * relation (a wizard will help you build the relation)
+      * relation (a wizard   will help you build the relation)
       * ManyToOne
       * OneToMany
       * ManyToMany

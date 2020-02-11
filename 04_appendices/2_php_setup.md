@@ -4,24 +4,24 @@
 
 ## Check if you have PHP installed and working
 
-You need PHP version 7.1.3 or later.
+You need PHP version 7.2.5 or later.
 
 Check your PHP version at the command line with:
 
 ```bash
     > php -v
-    PHP 7.1.5 (cli) (built: May  9 2017 19:49:10)
+    PHP 7.3.1 (cli) (built: May  9 2018 19:49:10)
     Copyright (c) 1997-2017 The PHP Group
     Zend Engine v3.1.0, Copyright (c) 1998-2017 Zend Technologies
 
 ```
 
-If your version is older than 7.1.5, or you get an error about command not understood, then complete the steps below.
+If your version is older than 7.2.5, or you get an error about command not understood, then complete the steps below.
 
 
 ### Download the latest version of PHP
 
-Get the latest (7.2.1 at the time of writing) PHP Windows ZIP from:
+Get the latest (7.4 at the time of writing) PHP Windows ZIP from:
 
 - [php.net](http://php.net/downloads.php) click the **Windows Downloads** link
 

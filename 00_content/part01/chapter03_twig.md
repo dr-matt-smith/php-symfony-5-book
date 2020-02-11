@@ -1,53 +1,30 @@
 
 # Twig templating
 
-## Add the debug-profiler bundle (`basic02`)
+## Customizing the Twig output (`basic02`)
 
+Look at the generated code for the `index()` method of class `DefaultController`:
 
-When developing we want all the error/warning/debugging information we can get. Let's add the Symfony profiler, which tells us lots about how thing are, and are not working with out site in development mode.
-
-
-```bash
-    $ composer req debug
+```php
+    namespace App\Controller;
     
-    Using version ^1.0 for symfony/debug-pack
-    ./composer.json has been updated
-    Loading composer repositories with package information
-    Updating dependencies (including require-dev)
-
-    ...
-```
-
-<!--
-![Screenshot of 404 error for URL path `/`. \label{404_error}](./03_figures/lab02/1_404_error.png)
--->
-
-NOTE: The debug bundle makes use of (requires) the Twig templating bundle. This will impact:
-
-- the look of error pages
-
-- the code generated for new controllers
-
-Try this (now we have Twig added):
-
-1. Delete the controller class file `/src/Controller/DefaultController.php`^[That's one great thing about working with generated code - we can delete it and regenerate it with little or no work.]
-
-2. Generate a new Default controller class with `php bin/console make:controller Default`
-
-3. Look at the generated code:
-
-    ```php
+    use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+    use Symfony\Component\Routing\Annotation\Route;
+    
+    class DefaultController extends AbstractController
+    {
         /**
          * @Route("/default", name="default")
          */
         public function index()
         {
-            // replace this line with your own code!
-            return $this->render('@Maker/demoPage.html.twig', [
-                'path' => str_replace($this->getParameter('kernel.project_dir').'/', '', __FILE__)
+            return $this->render('default/index.html.twig', [
+                'controller_name' => 'DefaultController',
             ]);
         }
-    ```
+    }
+
+```
 
 As you can see, the controller method now returns the output of method `$this->render(...)` rather than directly creating a `Response` object. With the Twig bundle added, each controller class now has access to the Twig `render(...)` method.
 
@@ -55,29 +32,9 @@ Figure \ref{generated_default_twig} shows a screenshot of the message created fr
 
 NOTE: The actual look of the default generated Twig content may be a little different (e.g. 19 Feb 2019 it now says `Hello DefaultController!`)...
 
-![Screenshot of generated page for URL path `/default`. \label{generated_default_twig}](./03_figures/lab02/2_generated_page.png)
+![Screenshot of generated page for URL path `/default`. \label{generated_default_twig}](./03_figures/part01/3_defaultFromTwig.png)
 
-## View the routes added by the profiler
 
-View the route list now - since our profile has added some (with the underscore `_` prefix):
-
-```bash
-      Name                       Method   Scheme   Host   Path
-     -------------------------- -------- -------- ------ -----------------------------------
-      default                    ANY      ANY      ANY    /default
-      _twig_error_test           ANY      ANY      ANY    /_error/{code}.{_format}
-      _wdt                       ANY      ANY      ANY    /_wdt/{token}
-      _profiler_home             ANY      ANY      ANY    /_profiler/
-      _profiler_search           ANY      ANY      ANY    /_profiler/search
-      _profiler_search_bar       ANY      ANY      ANY    /_profiler/search_bar
-      _profiler_phpinfo          ANY      ANY      ANY    /_profiler/phpinfo
-      _profiler_search_results   ANY      ANY      ANY    /_profiler/{token}/search/results
-      _profiler_open_file        ANY      ANY      ANY    /_profiler/open
-      _profiler                  ANY      ANY      ANY    /_profiler/{token}
-      _profiler_router           ANY      ANY      ANY    /_profiler/{token}/router
-      _profiler_exception        ANY      ANY      ANY    /_profiler/{token}/exception
-      _profiler_exception_css    ANY      ANY      ANY    /_profiler/{token}/exception.css
-```
 
 ## Specific URL path and internal name for our default route method
 
@@ -134,76 +91,27 @@ Figure \ref{hello_there} shows a screenshot of the message created from our `Res
 ![Screenshot of page seen for `new Response('hello there!')`. \label{hello_there}](./03_figures/lab02/3_hello_there.png)
 
 
-## Adding Twig directly
+## Clearing the cache
 
-If we hadn't added the profiler, we could have added just the Twig bundle as follows:
+Sometimes, when we've added a new route, we still get an error saying the route was not found, or showing us out-of-date content. This can be a problem of the Symfony **cache**.
 
-- Add Twig :
+So clearing the cache is a good way to resolve this problem (you may get in the habit of clearing the cache each time you add/change any routes).
 
-    ```bash
-        composer req twig
-    ```
+You can clear the cache in 2 ways:
 
-## Secruty checker bundle
+1. Simply delete directory `/var/cache`
 
-Another general bundle to always include is the Symfony security checkr:
-
-1. Add the Symfony security checker - a good one to **always** have
+1. Use the CLI command to clear the cache:
 
     ```bash
-        composer req sec-checker
+        $ php bin/console cache:clear
+        
+        // Clearing the cache for the dev environment with debug true                                                          
+        [OK] Cache for the "dev" environment (debug=true) was successfully cleared.   
+        
+        $
     ```
 
-
-## Development Symfony 4 recipes
-
-Libaries installed with `--dev` are only for use in our development setup - that software isn't used (or installed) for public deloployment of our `production` website that will actually run live on the internet.
-
-Here is the list of the most common development libraries we'll need:
-
-1. the Server recipe
-
-    ```bash
-        composer req --dev server
-    ```
-
-1. the Maker recipe (for development setup):
-
-    ```bash
-        composer req --dev make
-    ```
-
-1. Add the Symfony PHPUnit bridge(for development setup):
-
-    ```bash
-        composer req --dev phpunit
-    ```
-
-1. Add the Symfony web profiler (with great `dump()` functions!)
-
-    ```bash
-        composer req --dev profiler
-    ```
-
-1. Add the Symfony debugging libraries
-
-    ```bash
-        composer req --dev debug
-    ```
-
-## Install multple libraries in a single `composer` commad
-
-We can install all our non-development libraries with one command:
-
-```bash
-    composer req twig annotations sec-checker
-```
-
-and all our development libraries with another command (with the `--dev` option):
-
-```bash
-    composer req --dev server make phpunit debug profiler
-```
 
 ## Let's create a nice Twig hom page  
 
@@ -219,29 +127,27 @@ So we can simply write the following to ask Symfony to generate an HTTP response
          */
         public function indexAction()
         {
-            $template = 'default/homepage.html.twig';
+            $template = 'default/index.html.twig';
             $args = [];
             return $this->render($template, $args);
         }
 ```
 
-Now let's create that Twig template in `/templates/default/homepage.html.twig`:
+Now let's put our own personal content in that Twig template in `/templates/default/homepage.html.twig`!
 
-1. Create new directory  `/templates/default`
+- Replace the contents of file `index.html.twig` with the following:
 
-2. Create new file `/templates/default/homepage.html.twig`:
-
-```twig
-    {% extends 'base.html.twig' %}
-
-    {% block body %}
-        <h1>home page</h1>
-
-        <p>
-            welcome to the home page
-        </p>
-    {% endblock %}
-```
+    ```twig
+        {% extends 'base.html.twig' %}
+    
+        {% block body %}
+            <h1>Home page</h1>
+    
+            <p>
+                welcome to the home page
+            </p>
+        {% endblock %}
+    ```
 
 Note that Twig paths searches from the Twig root location of `/templates`, not from the location of the file doing the inheriting, so do **NOT** write `{% extends 'default/base.html.twig' %}`...
 

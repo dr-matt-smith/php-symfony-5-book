@@ -1,11 +1,10 @@
-# CRUD for a Student entity class
+# Create your own CRUD for a Student entity class
 
-      
 ## Create Student class
 
 Let's create a Student class and generate automatic CRUD web pages. 
 
-![Class diagram for Student entity.](./03_figures/app_crud/crud10_studentClass.png){ width=75% }
+![Class diagram for Student entity.](./03_figures/app_crud/student_ClassDiagram1.png){ width=75% }
 
 Do the following:
 
@@ -211,8 +210,12 @@ Kill the Symfony web server at the command line by pressing `<CTRL>-C`. Then qui
 
 You could also go have a cup of coffee, or perhaps shut down and restart your computer.
 
-Then restart the PHPStorm editor, and restart the web server with `php bin\console server:run`.
+Then restart the PHPStorm editor, and restart the web server with:
+
+```bash
+    symfony serve
+```
 
 Now open a web browser to URL `http://localhost:8000/student` and you should see that the students you created in your database are still there.
 
-Any changes we make are remembered (persisted) as part of our `var/data.db` database file.
+Any changes we make are remembered (persisted) as part of our database.

@@ -30,36 +30,11 @@ You can read more about ORMs and Symfony at:
 - [Wikipedia's ORM page](https://en.wikipedia.org/wiki/Object-relational_mapping)
 - [Symfony's Doctrine help pages](https://symfony.com/doc/current/doctrine.html)
 
-
-
-## Adding Doctrine DB package (project `db01`)
-
-First we need to install the `doctrine` Symfony package:
-
-```bash
-    $ composer req doctrine
-    Using version ^1.0 for symfony/orm-pack
-    ./composer.json has been updated
-    Loading composer repositories with package information
-    Updating dependencies (including require-dev)
-    Package operations: 14 installs, 0 updates, 0 removals
-      - Installing ocramius/package-versions (1.2.0): Loading from cache
-    ... lots of installs ...
-
-    Some files may have been created or updated to configure your new packages.
-    Please review, edit and commit them: these files are yours.
-
-     Next: Configuration
-
-      * Modify your DATABASE_URL config in .env
-
-      * Configure the driver (mysql) and
-        server_version (5.7) in config/packages/doctrine.yaml
-```
-
 ## Setting the database connection URL for MySQL
 
-Edit file `.env` to change the default database URL to one that will connect to MySQL server running at port 3306, with username `root` and password `pass`, and working with databse schema `web3`:
+NOTE: This chapter assumes you are starting from the Student basic project from the end of the last chapter...
+
+Edit file `.env` to change the default database URL to one that will connect to MySQL server running at port 3306, with username `root` and password `pass`, and working with databse schema `web3` (or whatever **you want to name your database ...**)
 
 So change this line in `.env` from:
 
@@ -115,5 +90,10 @@ Once you've learnt how to work with Entity classes and Doctrine, these are the 3
 
 This should make sense by the time you've reached the end of this database introduction.
 
+## Make your database
 
+We can now use the settings in the `.env` file to connect to the MySQL server and create our database schema:
 
+```bash
+    $ php bin/console doctrine:database:create
+```

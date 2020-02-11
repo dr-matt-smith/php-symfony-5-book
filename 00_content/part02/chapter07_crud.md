@@ -3,24 +3,15 @@
 # Symfony approach to database CRUD
 
 
-## Creating new student records (project `db01`)
+## Creating new student records (project `db02`)
 
-Let's add a new route and controller method to our `StudentController` class. This will define the `createAction()` method that receives parameter `$name` extracted from the route `/students/create/{name}`.
-
-
-We need to add `use` statements, so our controller class can work with `Student` and `StudentRepository` objects.
-
-Update the class declaration as follows:
-
+Let's add a new route and controller method to our `StudentController` class. This will define the `create()` method that receives parameter `$firstName`  and `$surname` extracted from the route `/students/create/{firstName}/{surname}`. This is all done automatically for us, through Symfony seeing the route parameters in the `@Route(...)` annotation comment that immediately precedes the controller method. The 'signature' for our new `create(...)` method names 2 parameters that match those in the `@Route(...)` annotation comment `create($firstName, $surame)`:
 
 ```php
-    namespace App\Controller;
-
-    use App\Entity\Student;
-    use App\Repository\StudentRepository;
-    use Symfony\Component\Routing\Annotation\Route;
-    use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-    use Symfony\Component\HttpFoundation\Response;
+    /**
+     * @Route("/student/create/{firstName}/{surname}")
+     */
+    public function create($firstName, $surname)
 ```
 
 
@@ -29,7 +20,7 @@ Creating a new `Student` object is straightforward, given `$firstName` and `$sur
 ```php
     $student = new Student();
     $student->setFirstName($firstName);
-    $student->setSurame($surname);
+    $student->setSurname($surname);
 ```
 
 Then we see the Doctrine code, to get a reference to the ORM `EntityManager`, to tell it to store (`persist`) the object `$product`, and then we tell it to finalise (i.e. write to the database) any entities waiting to be persisted:
@@ -40,13 +31,18 @@ Then we see the Doctrine code, to get a reference to the ORM `EntityManager`, to
     $em->flush();
 ```
 
-So the code for our create action is:
+So the code for our create controller method is:
 
 ```php
+    ...
+    // we need to add a 'use' statement so we can create a Response object...
+    use Symfony\Component\HttpFoundation\Response;
+    ...
+
     /**
      * @Route("/student/create/{firstName}/{surname}")
      */
-    public function createAction($firstName, $surname)
+    public function create($firstName, $surname)
     {
         $student = new Student();
         $student->setFirstName($firstName);
@@ -306,7 +302,7 @@ e.g. refactor the `update()` method to be as follows:
 ```
 
 
-## Given `id` let Doctrine find Product automatically (project `basic5`)
+## Given `id` let Doctrine find Product automatically (project `db03`)
 
 One of the features added when we installed the `annotations` bundle was the **Param Converter**.
 Perhaps the most used param converter is when we can substitute an entity `id` for a reference to the entity itself.
@@ -413,7 +409,7 @@ Likewise for update action:
 
 NOTE - we will now get ParamConverter errors rather than 404 errors if no record matches ID through ...
 
-## Creating the CRUD controller automatically from the CLI (project `db03`)
+## Creating the CRUD controller automatically from the CLI (project `db04`)
 
 Here is something you might want to look into - automatic generation of controllers and Twig templates (we'll look at this in more detail in a later chapter).
 
@@ -424,12 +420,6 @@ To try this out do the following:
 1. Delete the `StudentController` class, since we'll be generating one automatically
 
 1. Delete the `templates/student` directory, since we'll be generating those templates automatically
-
-1. Add some additional required components:
-
-    ```bash
-        $ composer require form validator security-csrf
-    ```
 
 1. Then use the make crud command:
     
@@ -457,4 +447,7 @@ You should see the following output in the CLI:
 ``` 
 
 You should find that you have now forms for creating and editing Student records, and controller routes for listing and showing records, and Twig templates to support all of this...
+
+NOTE: As usualy, if you get any messages about 'Route not found' or whatever, you need to delete the `/var/cache` ...
+
 

@@ -4,7 +4,7 @@
 
 
 
-## Initial values for your project database (project `db04`)
+## Initial values for your project database (project `db05`)
 
 Fixtures play two roles:
 
@@ -59,23 +59,31 @@ NOTE: Some fixtures will also require your class to include the  `ContainerAware
 
 Let's write a class to create 3 objects for entity `App\Entity\Student. The class will be declared in file `/src/DataFixtures/StudentFixtures.php`. Make a copy of the provided `AppFixtures` class naming the copy `StudentFixtures`, and change the class name inside the code.
 
-We also need to add a `use` statement so that our class can make use of the `Entity\Student` class. So you code should look as follows:
+We also need to add a `use` statement so that our class can make use of the `Entity\Student` class.
+
+The **make** feature will create a skeleton fixture class for us. So let's make class `StudentFixtures`:
+
+```bash
+    $ php bin/console make:fixtures StudentFixtures
+    
+     created: src/DataFixtures/StudentFixtures.php
+    
+      Success! 
+               
+     Next: Open your new fixtures class and start customizing it.
+     Load your fixtures by running: php bin/console doctrine:fixtures:load
+     Docs: https://symfony.com/doc/master/bundles/DoctrineFixturesBundle/index.html
+```
+
+Since we are going to be creating instance-objects of class `Student` we need to add a `use` statement:
 
 ```php
-    <?php
-    namespace App\DataFixtures;
+    ...
     
     use App\Entity\Student;
-    use Doctrine\Bundle\FixturesBundle\Fixture;
-    use Doctrine\Common\Persistence\ObjectManager;
     
     class StudentFixtures extends Fixture
     {
-        public function load(ObjectManager $manager)
-        {
-
-        }
-    }
 ```
 
 
@@ -154,7 +162,7 @@ Alternatively, you could execute an SQL query from the CLI using the `doctrine:q
           'surname' => string 'murph' (length=5)
 ```
 
-## User Faker to generate plausible test data (project `db05`)
+## User Faker to generate plausible test data (project `db06`)
 
 For testing purposes the `Faker` library is fantastic for generating plausible, random data.
 
@@ -164,6 +172,7 @@ Let's install it and generate some random students in our Fixtures class:
 
     ```bash
         $ composer req fzaninotto/faker
+   
         Using version ^1.7 for fzaninotto/faker
         ./composer.json has been updated
         Loading composer repositories with package information

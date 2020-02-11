@@ -6,7 +6,7 @@
 
 Our goals are to:
 
-- create a simple Student entity class
+- create a simple Student entity class (by hand - not using the **make** tool)
 - create a route / controller / template to show one student on a web page
 - create a repository class, to manage an array of Student objects
 - create a route / controller / template to list all students as a web page
@@ -86,9 +86,12 @@ Let's make this create a student (`1`, `matt`, `smith`) and display it with a Tw
          */
         public function index()
         {
-            $student = new Student(1, 'matt', 'smith');
-    
-            $template = 'student/show.html.twig';
+            $student = new Student();
+            $student->setId(99);
+            $student->setFirstName('matt');
+            $student->setSurname('Smith');
+            
+            $template = 'student/index.html.twig';
             $args = [
                 'student' => $student
             ];
@@ -102,9 +105,7 @@ NOTE:: Ensure your code has the appropriate `use` statement for the `App\Entity\
 
 ## The show student template `/templates/student/show.html.twig`
 
-If it does't already exist, create the directory `/templates/student`. If it did exist, you may need to delete a default generated `student/index.html.twig` - we'll create our own Twig templates from scratch.
- 
-In that directory create a new Twig template named `show.html.twig`. Write the following Twig code for the template:
+In folder `/templates/student` create a new Twig template `show.html.twig` containing the following:
 
 ```twig
     {% extends 'base.html.twig' %}
@@ -120,16 +121,45 @@ In that directory create a new Twig template named `show.html.twig`. Write the f
     {% endblock %}
 ```
 
-Run the web server and visit `/student`, and you should see our student details displayed as a nice HTML page.
+Do the following:
+
+- Run the web server
+
+    `symnfony serve`
+ 
+- Visit `/student`
+
+    -  you should see our student details displayed as a nice HTML page.
 
 
 Figure \ref{student_show} shows a screenshot our student details web page.
 
 ![Screenshot of student show page. \label{student_show}](./03_figures/lab03_entities/1_show_student.png)
 
+## Twig debug `dump(...)` function
+
+A very useful feature of Twig is its `dump(...)` function. This outputs to the web page a syntax colored dump of the variable its passed. It's similar to the PHP `var_dump(...)` function. Figure \ref{twig_debug} shows a screenshot of adding the following to our `index.html.twig` template:
+
+```twig
+    {% block body %}
+        <h1>Student SHOW page</h1>
+        <p>
+            id = {{ student.id }}
+            <br>
+            name = {{ student.firstName }} {{ student.surname }}
+        </p>
+    
+        {{ dump (student) }}
+    {% endblock %}
+```
+
+![Screenshot of student show page. \label{twig_debug}](./03_figures/part01/4_twigDebug.png)
+
+
 ## Creating an Entity Repository (`basic04`)
 
-Let's create a repository class to work with collections of Student objects. So let's create class `StudentRepository` in a new directory `/src/Repository`:
+We will now move on to work with an **array** of `Student` objects, which we'll make easy to work with by creating a `Repository` class.
+Let's create the `StudentRepository` class to work with collections of Student objects. Create PHP class file `StudentRepository.php` in directory `/src/Repository`:
 
 ```php
     <?php
@@ -144,13 +174,24 @@ Let's create a repository class to work with collections of Student objects. So 
         public function __construct()
         {
             $id = 1;
-            $s1 = new Student($id, 'matt', 'smith');
+            $s1 = new Student();
+            $s1->setId(1);
+            $s1->setFirstName('matt');
+            $s1->setSurname('smith');
             $this->students[$id] = $s1;
+    
             $id = 2;
-            $s2 = new Student($id, 'joelle', 'murphy');
+            $s2 = new Student();
+            $s2->setId(2);
+            $s2->setFirstName('joelle');
+            $s2->setSurname('murphy');
             $this->students[$id] = $s2;
+    
             $id = 3;
-            $s3 = new Student($id, 'frances', 'mcguinness');
+            $s3 = new Student();
+            $s3->setId(3);
+            $s3->setFirstName('frances');
+            $s3->setSurname('mcguinness');
             $this->students[$id] = $s3;
         }
 
@@ -163,46 +204,49 @@ Let's create a repository class to work with collections of Student objects. So 
 
 ## The student list controller method
 
-Now we have a repository that can supply a list of students, let's created a new route `/student/list` that will retrieve the array of student records from an instance of `StudentRepository`, and pass that array to a Twig template, to loop through and display each one. We'll give this route the internal name `student_list` in our annotation comment.
+Let's replace the contents of our `index()` method in the `StudentController` class, with one that will retrieve the array of student records from an instance of `StudentRepository`, and pass that array to our Twig template. The Twig template will loop through and display each one. 
 
-Add method `listAction()` to the controller class `StudentController`:
+Replace the existing method `index()` of controller class `StudentController` with the following:
 
 ```php
-    use App\Repository\StudentRepository;
+    ... 
 
-    ...
-
-    /**
-     * @Route("/student/list", name="student_list")
-     */
-    public function listAction()
+    class StudentController extends AbstractController
     {
-        $studentRepository = new StudentRepository();
-        $students = $studentRepository->findAll();
-
-        $template = 'student/list.html.twig';
-        $args = [
-            'students' => $students
-        ];
-        return $this->render($template, $args);
-    }
+        ...
+    
+        /**
+         * @Route("/student", name="student")
+         */
+        public function index()
+        {
+            $studentRepository = new StudentRepository();
+            $students = $studentRepository->findAll();
+    
+            $template = 'student/index.html.twig';
+            $args = [
+                'students' => $students
+            ];
+            return $this->render($template, $args);
+        }
 ```
 
-We should see this new route in our list of routes:
+So our routes remain the same, with the URL pattern `/student` being routed to our `StudentController->index()` method:
 
 ```bash
+    $ php bin/console debug:router
+
      -------------------------- -------- -------- ------ -----------------------------------
       Name                       Method   Scheme   Host   Path
      -------------------------- -------- -------- ------ -----------------------------------
+      _... (lots of other debug profiler routes)
       homepage                   ANY      ANY      ANY    /
-      student_show               ANY      ANY      ANY    /student
-      student_list               ANY      ANY      ANY    /student/list
-      ... and the debug / profile routes ...
+      student                    ANY      ANY      ANY    /student
 ```
 
-## The list student template `/templates/student/list.html.twig`
+## The list student template `/templates/student/index.html.twig`
 
-In  directory `/templates/student` create a new Twig template named `list.html.twig`. Write the following Twig code for the template:
+In  directory `/templates/student` replace the contents of Twig template `index.html.twig` with the following:
 
 ```twig
     {% extends 'base.html.twig' %}
@@ -222,24 +266,26 @@ In  directory `/templates/student` create a new Twig template named `list.html.t
     {% endblock %}
 ```
 
-Run the web server and visit `/student/list`, and you should see a list of all student details displayed as a nice HTML page.
+Run the web server and visit `/student`, and you should see a list of all student details displayed as a nice HTML page.
 
 
 Figure \ref{student_list} shows a screenshot our list of students web page.
 
-![Screenshot of student list page. \label{student_list}](./03_figures/lab03_entities/2_list_student.png)
+![Screenshot of student list page. \label{student_list}](./03_figures/lab03_entities/2_list_student.png){width=60%}
 
 ## Refactor show action to show details of one Student object  (project `basic05`)
 
-The usual convention for CRUD is that the **show** action will display the details of an object given its `id`. So let's refactor our method `showAction()` to do this, and also we'll need to add a `findOne(...)` method to our repository class, that returns an object given an id.
+The usual convention for CRUD is that the **show** action will display the details of an object given its `id`. So let's write a new `StudentController` method `show()` to do this. We'll need to add a `findOne(...)` method to our repository class, that returns an object given an id.
 
-The route we'll design will be in the form `/student/{id}`, where `{id}` will be the integer `id` of the object in the repository we wish to display. And, conincidentally, this is just the correct syntax for routes with parameters that we write in the annotation comments to define routes for controller methods in Symfony ...
+The route we'll design will be in the form `/student/{id}`, where `{id}` will be the integer `id` of the object in the repository we wish to display. And, coincidentally, this is just the correct syntax for routes with parameters that we write in the annotation comments to define routes for controller methods in Symfony ...
+
+NOTE: We'll give this **show** route the internal name `student_show` - these internal route names are used when we create links between pages in our Twig templates, and so it's important to name them meaninfully and consistently to make later coding straightforward.
 
 ```php
     /**
      * @Route("/student/{id}", name="student_show")
      */
-    public function showAction($id)
+    public function show($id)
     {
         $studentRepository = new StudentRepository();
         $student = $studentRepository->find($id);
@@ -260,7 +306,7 @@ While we are at it, we'll change the route for our list action, to make a list o
         /**
          * @Route("/student", name="student_list")
          */
-        public function listAction()
+        public function list()
         {
             ... as before
         }
@@ -268,21 +314,22 @@ While we are at it, we'll change the route for our list action, to make a list o
 
 We can check these routes via the console:
 
-- `/student/{id}` will invoke our `showAction($id)` method
-- `/student` will invoke our `listAction()` method
+- `/student/{id}` will invoke our `show($id)` method
+- `/student` will invoke our `list()` method
 
 ```bash
      -------------------------- -------- -------- ------ -----------------------------------
       Name                       Method   Scheme   Host   Path
      -------------------------- -------- -------- ------ -----------------------------------
+      _... (lots of other debug profiler routes)
       homepage                   ANY      ANY      ANY    /
-      student_show               ANY      ANY      ANY    /student/{id}
       student_list               ANY      ANY      ANY    /student
+      student_show               ANY      ANY      ANY    /student/{id}
 ```
 
 If you have issues of Symfony not finding a new route you've added via a controller annotation comment, try the following.
 
-It's a good idea to **CLEAR THE CACHE** when addeding/changing routes, otherwise Symfony may not recognised the new or changed routes ... Either manually delete the `/var/cache` directory, or run the `cache:clear` console command:
+It's a good idea to **CLEAR THE CACHE** when adding/changing routes, otherwise Symfony may not recognised the new or changed routes ... Either manually delete the `/var/cache` directory, or run the `cache:clear` console command:
 
 ```bash
     $ php bin/console cache:clear
@@ -293,13 +340,33 @@ It's a good idea to **CLEAR THE CACHE** when addeding/changing routes, otherwise
 
 Symfony caches (stores) routing data and also rendered pages from Twig, to speed up response time. But if you have changed controllers and routes, sometimes you have to manually delete the cache to ensure all new routes are checked against new requests.
 
+
+## Adding a `find($id)` method to the student repository
+
+Let's add the find-one-by-id method to class `StudentRepository`:
+
+```php
+    public function find($id)
+    {
+        if(array_key_exists($id, $this->students)){
+            return $this->students[$id];
+        } else {
+            return null;
+        }
+    }
+```
+
+If an object can be found with the key of `$id` it will be returned, otherwise `null` will be returned.
+
+NOTE: At this time our code will fail if someone tries to show a student with an Id that is not in our repository array ...
+
 ## Make each item in list a link to show
 
 Let's link our templates together, so that we have a clickable link for each student
 listed in the list template, that then makes a request to show the details for the student
 with that id.
 
-In our list template `/templates/student/list.html.twig` we can get the id for the current student
+In our list template `/templates/student/index.html.twig` we can get the id for the current student
 with `student.id`. The internal name for our show route is `student_show`. We can use the `url(...)` Twig function to generate the URL path for a route, and in this case an `id` parameter.
 
 So we update `list.html.twig` to look as follows, where we add a list `(details)` that will request a student's details to be displayed with our show route:
@@ -351,24 +418,6 @@ Thus we can pass an array of parameter-value pairs to a route in Twig using the 
     url('student_show', {id : student.id} )
 ```
 
-## Adding a `find($id)` method to the student repository
-
-Let's add the find-one-by-id method to class `StudentRepository`:
-
-```php
-    public function find($id)
-    {
-        if(array_key_exists($id, $this->students)){
-            return $this->students[$id];
-        } else {
-            return null;
-        }
-    }
-```
-
-If an object can be found with the key of `$id` it will be returned, otherwise `null` will be returned.
-
-NOTE: At this time our code will fail if someone tries to show a student with an Id that is not in our repository array ...
 
 
 Figure \ref{list_with_links} shows a screenshot our list of students web page, with a `(details)` hypertext link to the show page for each individual student obbject.
@@ -412,6 +461,8 @@ and a Twig template `/templates/error/404.html.twig` looking like this:
 
 ```twig
     {% extends 'base.html.twig' %}
+    
+    {% block title %}ERROR PAGE{% endblock %}
 
     {% block body %}
         <h1>Whoops! something went wrong</h1>
@@ -424,4 +475,8 @@ and a Twig template `/templates/error/404.html.twig` looking like this:
     {% endblock %}
 ```
 
+NOTE: We have overriden the `title` Twig block, so that the page title is `ERROR PAGE`...
 
+Figure \ref{error404} shows a screenshot of our custom 404 error template for when no such student can be found for the given ID.
+
+![Error page for non-existant student ID = 66. \label{error404}](./03_figures/part01/5_404error.png)

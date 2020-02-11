@@ -29,7 +29,7 @@ So in summary, Git and PHP are open source core software. Github and PHPStorm ar
 
 Ensure you have the following setup for developing Symfony software on your local machine
 
-- PHP 7.1.5 or later (free, open source)
+- PHP 7.2.5 or later (free, open source)
 - Composer (up-to-date with `composer self-update`)(free, open source - a PHP program!)
 - PHPStorm (with educational free account if you're a student!) - or some other editor of your choice
 - MySQL Workbench (Community Edition free)

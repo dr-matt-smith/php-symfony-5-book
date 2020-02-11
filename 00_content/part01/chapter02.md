@@ -3,7 +3,7 @@
 
 ## What we'll make (`basic01`)
 
-See Figure \ref{new_home_page} for a screenshot of the new homepage we'll create in our first project.
+See Figure \ref{new_home_page} for a screenshot of the new homepage we'll create in our first project (after some  setup steps).
 
 ![New home page.\label{new_home_page}](./03_figures/lab02/5_twig_page.png)
 
@@ -32,7 +32,7 @@ For example the code below defines:
 
     -- ```@Route("/", name="homepage")```
 
-    -- the Symfony "router" system attemptes to match pattern  `/` in the URL of the HTTP Request received by the server
+    -- the Symfony "router" system attempts to match pattern  `/` in the URL of the HTTP Request received by the server
 
 - controller method `indexAction()`
 
@@ -51,10 +51,10 @@ For example the code below defines:
 
 ## Create a new Symfony project
 
-1. Create new Symfony 4 project (and then `cd` into it):
+1. Create new Symfony project (and then `cd` into it):
 
     ```bash
-        $ composer create-project symfony/skeleton basic01
+        $ symfony new --full basic01
         Installing symfony/skeleton (v4.0.5)
           - Installing symfony/skeleton (v4.0.5): Loading from cache
 
@@ -63,85 +63,72 @@ For example the code below defines:
         $ cd basic01
     ```
 
-
-1. Add the Symfony local development server:
-
-    ```bash
-        composer req --dev server
-    ```
-
-
-NOTE: To **remove** a package use `composer rem <package>`, e.g. `composer rem server`.
-
-Check this vanilla, empty project is all fine by running the web sever and visit website root at `http://localhost:8000/`:
+1. Check this vanilla, empty project is all fine by running the web sever and visit website root at `http://localhost:8000/`:
 
 ```bash
-$ php bin/console server:run
- [OK] Server listening on http://127.0.0.1:8000
- // Quit the server with CONTROL-C.
+    $ symfony serve
+     [OK] Server listening on http://127.0.0.1:8000
+     // Quit the server with CONTROL-C.
 ```
 
 Figure \ref{default_page} shows a screenshot of the default page for the web root (path `/`), when we have no routes set up and we are in development mode (i.e. our `.env` file contains `APP_ENV=dev`).
 
-![Screenshot default Symfony 4 page for web root (when no routes defined). \label{default_page}](./03_figures/lab02/0_default_page.png)
+![Screenshot default Symfony 4 page for web root (when no routes defined). \label{default_page}](./03_figures/chapter02/0_default_page_sf5.png)
 
 ## List the routes
 
-There should not be any routes yet - but let's check at the console:
+There should not be any (non-debug) routes yet. All routes starting with an underscore `_` symbol are debugging routes used by the verye useful Symfony profiler - this creates the information footer at the bottom of our pages when we are developing Symfony applications.
+
+ but let's check at the console by typing `php bin/console debug:router`:
 
 ```
     $ php bin/console debug:router
-      Name   Method   Scheme   Host   Path
-     ------ -------- -------- ------ ------
+         -------------------------- -------- -------- ------ ----------------------------------- 
+          Name                       Method   Scheme   Host   Path                               
+         -------------------------- -------- -------- ------ ----------------------------------- 
+          _preview_error             ANY      ANY      ANY    /_error/{code}.{_format}           
+          _wdt                       ANY      ANY      ANY    /_wdt/{token}                      
+          _profiler_home             ANY      ANY      ANY    /_profiler/                        
+          _profiler_search           ANY      ANY      ANY    /_profiler/search                  
+          _profiler_search_bar       ANY      ANY      ANY    /_profiler/search_bar              
+          _profiler_phpinfo          ANY      ANY      ANY    /_profiler/phpinfo                 
+          _profiler_search_results   ANY      ANY      ANY    /_profiler/{token}/search/results  
+          _profiler_open_file        ANY      ANY      ANY    /_profiler/open                    
+          _profiler                  ANY      ANY      ANY    /_profiler/{token}                 
+          _profiler_router           ANY      ANY      ANY    /_profiler/{token}/router          
+          _profiler_exception        ANY      ANY      ANY    /_profiler/{token}/exception       
+          _profiler_exception_css    ANY      ANY      ANY    /_profiler/{token}/exception.css   
+         -------------------------- -------- -------- ------ ----------------------------------- 
 ```
 
-## Add the annotations bundle
-
-Since we'll be defining routes using annotation comments, we need to ask Composer to download the annotations bundle into our `/vendor` directory (and register the bundle, and update the autoloader etc.):
-
-1. Add Annotations :
-
-    ```bash
-        $ composer req annotations
-        Using version ^5.1 for sensio/framework-extra-bundle
-        ./composer.json has been updated
-        Loading composer repositories with package information
-        ...
-        Some files may have been created or updated to configure your new packages.
-        Please review, edit and commit them: these files are yours.
-    ```
+The only routes we can see all start with an underscore (e.g. `_preview_error`), so no application routes have been declared yet ...
 
 ## Create a controller
 
 We could write a new class for our homepage controller, but ... let's ask Symfony to make it for us. Typical pages seen by non-logged-in users like the home page, about page, contact details etc. are often referred to as 'default' pages, and so we'll name the controller class for these pages our `DefaultController`.
 
-1. First we need to add the `make` bundle to our console tool (for our development environment):
-
-    ```bash
-        $ composer req --dev make
-        Using version ^1.0 for symfony/maker-bundle
-        ./composer.json has been updated
-        Loading composer repositories with package information
-        ...
-    ```
-
-2. Now let's ask Symfony to create a new homepage (default) controller:
+1. Tell Symfony to create a new homepage (default) controller:
 
 ```bash
     $ php bin/console make:controller Default
-    created: src/Controller/DefaultController.php
 
-    Success!
-    Next: Open your new controller class and add some pages!
+         created: src/Controller/DefaultController.php
+         created: templates/default/index.html.twig
+        
+          Success! 
+        
+         Next: Open your new controller class and add some pages!
 ```
 
-NOTE: Symfony controller classes are stored in directory `/src/Controller`.
+Symfony controller classes are stored in directory `/src/Controller`. We can see that a new controller class has been created 
+named `DefaultController.php` in folder `/src/Controller`.
+
+A second file was also created, a view template file `templates/default/index.html.twig`,
 
 Look inside the generated class `/src/Controller/DefaultController.php`. It should look something like this:
 
 ```php
-    <?php
-    
+    <?php    
     namespace App\Controller;
     
     use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -154,15 +141,15 @@ Look inside the generated class `/src/Controller/DefaultController.php`. It shou
          */
         public function index()
         {
-            return $this->json([
-                'message' => 'Welcome to your new controller!',
-                'path' => 'src/Controller/DefaultController.php',
+            return $this->render('default/index.html.twig', [
+                'controller_name' => 'DefaultController',
             ]);
         }
     }
+
 ```
 
-This default controller actually returns a JSON object: 
+This default controller uses a **Twig** template to return an HTML page. 
 
 ```json
     {
@@ -171,11 +158,15 @@ This default controller actually returns a JSON object:
     }
 ```
 
-Let's change this to return a text response. Do the following:
+Let's 'make this our own' by changing the contents of the Response returned to a simple text response. Do the following:
 
-1. Add a `use` statement for the `Symfony\Component\HttpFoundation\Response` class
+- comment-out the body of the `index()` method
 
-2. Change the body of the `index()` method to output a simple text message response:
+- at the top of the class add a `use` statement, so we can make use of the Symfony HTTFoundation class `Response`
+
+    `use Symfony\Component\HttpFoundation\Response;`
+
+- write a new body for the `index()` method to output a simple text message response:
 
     ```php
         return new Response('Welcome to your new controller!');
@@ -183,6 +174,7 @@ Let's change this to return a text response. Do the following:
 
 So the listing of your `DefaultController` should look as follows:
 ```php
+<?php
     namespace App\Controller;
     
     use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -197,15 +189,13 @@ So the listing of your `DefaultController` should look as follows:
         public function index()
         {
             return new Response('Welcome to your new controller!');
+    //        return $this->render('default/index.html.twig', [
+    //            'controller_name' => 'DefaultController',
+    //        ]);
         }
     }
+
 ```
-
-
-
-Learn more about the Maker bundle:
-
-- [https://symfony.com/blog/introducing-the-symfony-maker-bundle](https://symfony.com/blog/introducing-the-symfony-maker-bundle)
 
 
 ## Run web server to visit new default route
@@ -220,6 +210,7 @@ Since we **have** defined a route, we don't get the default page any more. Howev
 ```bash
   Name                       Method   Scheme   Host   Path
  -------------------------- -------- -------- ------ -----------------------------------
+  _...(all those debug routes starting with _ )
   default                    ANY      ANY      ANY    /default
 ```
 
@@ -236,23 +227,40 @@ Figure \ref{generated_default} shows a screenshot of the message created from ou
 
 ![Screenshot of generated page for URL path `/default`. \label{generated_default}](./03_figures/part01/2_default_page_no_twig.png)
 
-## Clearing the cache
 
-Sometimes, when we've added a new route, we still get an error saying the route was not found. This can be a problem of the Symfony **cache**.
+## Other types of Response content
 
-So clearing the cache is a good way to resolve this problem (you may get in the habit of clearing the cache each time you add/change any routes).
+We could also have asked our Controller function to return JSON rather than text. We can create JSON either using Twig,
+ or with the inherited `->json(...)` method. For example, try replacing the body of your `index()` method with the following:
 
-You can clear the cache in 2 ways:
+```php
+        public function index()
+        {
+            return $this->json([
+                'name' => 'matt',
+                'age' => '21 again!',
+            ]);
+        }
+```
 
-1. Simply delete directory `/var/cache`
 
-1. Use the CLI command to clear the cache:
+## The default Twig page
 
-    ```bash
-        $ php bin/console cache:clear
-        
-        // Clearing the cache for the dev environment with debug true                                                          
-        [OK] Cache for the "dev" environment (debug=true) was successfully cleared.   
-        
-        $
-    ```
+If we return our `index()` method back to what was first automatically generated for us, we can see an HTML page in our browser that is output from the Twig template:
+
+```php
+    public function index()
+    {
+        return $this->render('default/index.html.twig', [
+            'controller_name' => 'DefaultController',
+        ]);
+    }
+```
+
+
+Figure \ref{generated_twig_default} shows a screenshot of the Twig HTML page that was automatically generated.
+
+![Screenshot of generated Twig page for URL path `/default`. \label{generated_twig_default}](./03_figures/part01/3_defaultFromTwig.png)
+
+
+
