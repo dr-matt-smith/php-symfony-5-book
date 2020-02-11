@@ -25,6 +25,7 @@ Get the latest (7.4 at the time of writing) PHP Windows ZIP from:
 
 - [php.net](http://php.net/downloads.php) click the **Windows Downloads** link
 
+NOTE: If installing on Windows ensure you are **displaying file extensions**, e.g. so you see `php.exe` and `php.ini` not just `php` - Don't relyon Windows to show the right icon while *hiding the full filename*...
 
 Figure \ref{windows_zip} shows a screenshot of the `php.net` general and Windows downloads page. The `ZIP` file to download (containing `php.exe` ... don't download the source code version unless you want to build the file from code ...):
 
@@ -38,16 +39,6 @@ Do the following:
 
 - make a copy the file `C:\php\php.ini-development`, naming the copy  `C:\php\php.ini`
 
-- open a new terminal CLI window (so new settings are loaded) and run `php --ini` to confirm the location of the `php.ini` file that you've just created. Note the following for a Mac - for Windows it should (hopefully) tell you it found the ini file in `c:\php\php.ini`:
-
-```bash
-    $ php --ini
-    Configuration File (php.ini) Path: /Applications/MAMP/bin/php/php7.1.8/conf
-    Loaded Configuration File:         /Applications/MAMP/bin/php/php7.1.8/conf/php.ini
-    Scan for additional .ini files in: (none)
-    Additional .ini files parsed:      (none)
-```
-
 ## Add the **path** to `php.exe` to your System environment variables
 
 Whenever you type a command at the CLI (Command Line Interface) Windows searches through all the directories in its `path` environment variable. In order to use PHP at the CLI we need to add `c:\php` to the `path` environment variable so the  `php.exe` executable can be found.
@@ -60,6 +51,17 @@ Figure \ref{env2} shows a screenshot of the Windows system and environment varia
 
 ![The Windows Environment Variables editor. \label{env2}](./03_figures/app00_php/env2.png)
 
+## Check your `php.ini` file
+ 
+Open a new terminal CLI window (so new settings are loaded) and run `php --ini` to confirm the location of the `php.ini` file that you've just created. Note the following for a Mac - for Windows it should (hopefully) tell you it found the ini file in `c:\php\php.ini`:
+
+```bash
+    $ php --ini
+    Configuration File (php.ini) Path: /Applications/MAMP/bin/php/php7.1.8/conf
+    Loaded Configuration File:         /Applications/MAMP/bin/php/php7.1.8/conf/php.ini
+    Scan for additional .ini files in: (none)
+    Additional .ini files parsed:      (none)
+```
 
 
 ## PHP Info & SQL driver test
@@ -102,11 +104,11 @@ But, if you see “no value” under the PDO drivers section, then we’ll need 
         ;;;;;;;;;;;;;;;;;;;;;;
 
         .. other lines here ...
-        extension=php_pdo_mysql.dll <<<<<<<<<< here is the PDO MYSQL driver line
-        ;extension=php_pdo_oci.dll
-        ;extension=php_pdo_odbc.dll
-        ;extension=php_pdo_pgsql.dll
-        extension=php_pdo_sqlite.dll <<<<<<<<  here is the PDO SQLITE driver line
+        extension=php_pdo_mysql <<<<<<<<<< here is the PDO MYSQL driver line
+        ;extension=php_pdo_oci
+        ;extension=php_pdo_odbc
+        ;extension=php_pdo_pgsql
+        extension=php_pdo_sqlite <<<<<<<<  here is the PDO SQLITE driver line
     ```
 3. Save the file. Close your Command Prompt, and re-open it (to ensure new settings are used).
 
