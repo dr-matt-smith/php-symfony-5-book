@@ -2,6 +2,8 @@
 
 An introduction to Symfony5
 
+This repo is the [Pandoc](https://pandoc.org/) markdown-based source for the book. The output PDF(s) can be found in folder `_OUTPUT_PDF`. The most up-to-date version of the book PDF will be named `_BOOK_current_draft.pdf`.
+
 have fun coding
 
 .. matt ..
