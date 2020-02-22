@@ -163,10 +163,11 @@ Do the following:
 
     ```html
            <nav class="navbar navbar-expand-lg navbar-dark navbar-bg mb-5">
-               <a style="margin-left: 75px;" class="navbar-brand space-brand" href="#">
+               <a style="margin-left: 0.1rem;" class="navbar-brand space-brand" href="#">
                    My Great Website !
                </a>
        
+               <ul>
                    <li>
                        <a href="{{ path('student_list') }}">student actions</a>
                    </li>
@@ -188,7 +189,7 @@ We need to add a Bootstrap styled unordered-list in the `<nav>` element, with li
 
 ```html
         <nav class="navbar navbar-expand-lg navbar-dark navbar-bg mb-5">
-            <a style="margin-left: 75px;" class="navbar-brand space-brand" href="#">
+            <a style="margin-left: 0.1rem;" class="navbar-brand space-brand" href="#">
                 My Great Website !
             </a>
     
@@ -241,7 +242,7 @@ We also need to wrap a collapse `<div>` around our unordered list of links, with
 So our complete `<nav>` element now looks as follows:
 ```html
     <nav class="navbar navbar-expand-lg navbar-dark navbar-bg mb-5">
-        <a style="margin-left: 75px;" class="navbar-brand space-brand" href="#">
+        <a style="margin-left: 0.1rem;" class="navbar-brand space-brand" href="#">
             My Great Website !
         </a>
 
