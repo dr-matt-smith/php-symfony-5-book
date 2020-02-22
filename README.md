@@ -1,6 +1,6 @@
 # php-symfony5  -book
 
-LICENCE - This work copyright &copy; Matt Smith, but I've made this repo public so that students/PHP proigrammers can have free access to these notes for their own private use. You may not publish these markdown files or the PDFs
+LICENCE - This work copyright &copy; Matt Smith, but I've made this repo public so that students/PHP programmers can have free access to these notes for their own private use. You may not publish these markdown files or the PDFs
 
 An introduction to Symfony5
 
