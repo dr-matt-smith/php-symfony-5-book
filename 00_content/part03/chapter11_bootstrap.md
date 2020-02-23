@@ -40,7 +40,8 @@ to `/config/packages/twig.yml` file. So this file should now look as follows;
 
 The Bootstrap QuickStart tells us to copy the CSS `<link>` tag from here:
 
-- [https://getbootstrap.com/docs/4.1/getting-started/introduction/#css](https://getbootstrap.com/docs/4.1/getting-started/introduction/#css)
+- [https://getbootstrap.com/docs/4.4/getting-started/introduction/#css](https://getbootstrap.com/docs/4.4/getting-started/introduction/#css)
+
 
 into the CSS part of our `/templates/base.html.twig` Twig template. Add this `<link>` tag just before the `stylesheets` block:
 
@@ -52,8 +53,8 @@ into the CSS part of our `/templates/base.html.twig` Twig template. Add this `<l
         <style>
             @import '/css/flash.css';
         </style>
-    
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         
         {% block stylesheets %}{% endblock %}
         
@@ -67,7 +68,7 @@ into the CSS part of our `/templates/base.html.twig` Twig template. Add this `<l
 
 The Bootstrap QuickStart tells us to copy the JS `<script>` tags from here:
 
-- [https://getbootstrap.com/docs/4.1/getting-started/introduction/#js](https://getbootstrap.com/docs/4.1/getting-started/introduction/#js)
+- [https://getbootstrap.com/docs/4.4/getting-started/introduction/#js](https://getbootstrap.com/docs/4.4/getting-started/introduction/#js)
 
 into the last part of the `<body>` element in `/templates/base.html.twig` Twig template. Add these `<script>` tags just after the `javascripts` block:
 
@@ -87,9 +88,10 @@ into the last part of the `<body>` element in `/templates/base.html.twig` Twig t
     
         {% block javascripts %}{% endblock %}
     
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
     
     </body>
 </html>
@@ -109,9 +111,11 @@ Figure \ref{form_bootstrap_source} shows the HTML source - we can see no page/co
 
 ## Adding elements for navigation and page content
 
-Let's ensure main `body` content of every page is inside a Bootstrap XX element.
+Let's ensure main `body` content of every page is inside a Bootstrap 4 element.
 
-We need to wrap a Bootstrap container and row divs around the `body` Twig block:
+We need to wrap a Bootstrap container and row divs around the `body` Twig block.
+
+Replace the existing `body` block in template `base.html.twig` with the following:
 
 ```twig
 
@@ -195,12 +199,12 @@ We need to add a Bootstrap styled unordered-list in the `<nav>` element, with li
     
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a style="color: #fff;" class="nav-link" href="{{ url('student_list') }}">
+                    <a class="nav-link" href="{{ url('student_list') }}">
                         student list
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a style="color: #fff;" class="nav-link" href="{{ url('student_new') }}">
+                    <a class="nav-link" href="{{ url('student_new_form') }}">
                         Create NEW student
                     </a>
                 </li>
@@ -245,22 +249,18 @@ So our complete `<nav>` element now looks as follows:
         <a style="margin-left: 0.1rem;" class="navbar-brand space-brand" href="#">
             My Great Website !
         </a>
-
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
-                data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown"
-                aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a style="color: #fff;" class="nav-link" href="{{ url('student_list') }}">
-                        student list
+                    <a class="nav-link" href="{{ url('student_list') }}"> student list
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a style="color: #fff;" class="nav-link" href="{{ url('student_new') }}">
+                    <a class="nav-link" href="{{ url('student_new_form') }}">
                         Create NEW student
                     </a>
                 </li>

@@ -2,6 +2,12 @@
 
 # DIY forms
 
+## Preparation
+
+This project assumes you are working with a copy of project `db03` - i.e. with a D.I.Y. controller and templates.
+
+You can start with a copy from the book Github repositories if you wish:
+- [https://github.com/dr-matt-smith/php-symfony-5-book-codes-databases-03-param-converter](https://github.com/dr-matt-smith/php-symfony-5-book-codes-databases-03-param-converter)
 
 ## Adding a form for new Student creation (project `form01`)
 
@@ -10,14 +16,37 @@ Let's create a DIY (Do-It-Yourself) HTML form to create a new student. We'll nee
 - a controller method (and template) to display our new student form
 
     - route `/student/new`
+    
+        - with internal route name `student_new_form`
 
 - a controller method to process the submitted form data
 
     - route `/student/processNewForm`
+    
+        - with internal route name `student_process_new_form`
 
 The form will look as show in Figure \ref{new_student_form}.
 
 ![Form for a new student \label{new_student_form}](./03_figures/part03/1_new_student_form.png)
+
+## Refacfor our `create(...)` method
+
+Since we will now be creating new Students using a form, rather than passing the properties directly as `GET` partameters in thge URL, let's refactor our `create(...)` in class `StudentController` to be a private method (no route annotatiohn comment), that accepts 2 parameters and uses them to create a new Student obnject and store it in the database, then redirect to the list of students page:
+
+```php
+    private function create($firstName, $surname)
+    {
+        $student = new Student();
+        $student->setFirstName($firstName);
+        $student->setSurname($surname);
+    
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($student);
+        $em->flush();
+    
+        return $this->redirectToRoute('student_list');
+    }
+```
 
 ## Twig new student form
 
@@ -53,16 +82,16 @@ Here is our `StudentController` method `newForm()` to display our Twig form:
 
 ```php
     /**
-     * @Route("/student/new", name="student_new_form")
+     * @Route("/student/new", name="student_new")
      */
     public function newForm()
     {
-        $argsArray = [
+        $template = 'student/new.html.twig';
+        $args = [
         ];
-
-        $templateName = 'student/new';
-        return $this->render($templateName . '.html.twig', $argsArray);
+        return $this->render($template, $args);
     }
+
 ```
 
 
@@ -119,7 +148,7 @@ Our full listing for `StudentController` method `processNewForm()` looks as foll
         $surname = $request->request->get('surname');
 
         // forward this to the createAction() method
-        return $this->createAction($firstName, $surname);
+        return $this->create($firstName, $surname);
     }
 ```
 
@@ -217,19 +246,17 @@ Now we can add the empty string test (and flash error message) to our `processNe
 
         // valid if neither value is EMPTY
         $isValid = !empty($firstName) && !empty($surname);
-
         if(!$isValid){
             $this->addFlash(
-                'error',
-                'student firstName/surname cannot be an empty string'
-            );
-
+            'error',
+            'student firstName/surname cannot be an empty string'
+        );
             // forward this to the createAction() method
-            return $this->newForm($request);
+            return $this->newForm();
         }
 
         // forward this to the createAction() method
-        return $this->createAction($firstName, $surname);
+        return $this->create($firstName, $surname);
     }
 ```
 
@@ -254,7 +281,7 @@ Finally, we need to add code in our new student form Twig template to display an
         (... show HTML form as before ...)
 ```
 
-## Postback logic (project `form02`)
+## Postback logic (project `form03`)
 
 A common approach (and used in CRUD auto-generated code) is to combine the logic for displaying a form, and processing its submission, in a single method. The logic for this is that if any of the submitted data was invalid (or missing), then the default form processing can go back to re-displaying the form (with an appropriate 'flash' error message) to the user.
 
@@ -353,10 +380,9 @@ We can now simply replace the previous 2 methods `processNewFormAction()` and `n
 
 ```php
     /**
-     * @Route("/student/new", name="student_new",  methods={"POST", "GET"})
+     * @Route("/student/new", name="student_new_form", methods={"POST", "GET"})
      */
-    public function new(Request $request)
-    {
+    public function new(Request $request) {
         // attempt to find values in POST variables
         $firstName = $request->request->get('firstName');
         $surname = $request->request->get('surname');
@@ -369,17 +395,21 @@ We can now simply replace the previous 2 methods `processNewFormAction()` and `n
 
         // if SUBMITTED & VALID - go ahead and create new object
         if ($isSubmitted && $isValid) {
-            return $this->createAction($firstName, $surname);
+            return $this->create($firstName, $surname);
         }
 
+        if ($isSubmitted && !$isValid) { $this->addFlash(
+            'error',
+            'student firstName/surname cannot be an empty string'
+        );
+        }
         // render the form for the user
         $template = 'student/new.html.twig';
-        $argsArray = [
+        $args = [
             'firstName' => $firstName,
             'surname' => $surname
         ];
-
-        return $this->render($template, $argsArray);
+        return $this->render($template, $args);
     }
 ```
 

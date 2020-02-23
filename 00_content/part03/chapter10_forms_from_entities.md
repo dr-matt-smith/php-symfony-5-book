@@ -18,13 +18,7 @@ However, first, let's simplify something for later, we'll make our `createAction
     }
 ```
 
-## The form generator
-
-First ensure your project has this package:
-
-```bash
-    $ composer req form
-```
+## The Symfony form generator via Twig
 
 In a controller we can create a `$form` object, and pass this as a Twig variable to the template `form`. Twig offers 4 special functions for rendering (displaying) forms, these are:
 
