@@ -99,13 +99,13 @@ For example:
 
 ```
     <div>
-        {{ form_label(form.name) }}
+        {{ form_label(form.firstName) }}
 
         <div class="errors">
-        {{ form_errors(form.name) }}
+        {{ form_errors(form.firstName) }}
         </div>
 
-        {{ form_widget(form.name) }}
+        {{ form_widget(form.firstName) }}
     </div>
 ```
 So we could display our new student form this way:
@@ -115,17 +115,27 @@ So we could display our new student form this way:
         <h1>Create new student</h1>
         {{ form_start(form) }}
 
-    <div>
+   <div class="form-group">
         <div class="errors">
-        {{ form_errors(form.name) }}
+        {{ form_errors(form.firstName) }}
         </div>
 
-        {{ form_label(form.name) }}
+        {{ form_label(form.firstName) }}
 
-        {{ form_widget(form.name) }}
+        {{ form_widget(form.firstName) }}
     </div>
 
-    <div>
+   <div class="form-group">
+        <div class="errors">
+        {{ form_errors(form.surname) }}
+        </div>
+
+        {{ form_label(form.surname) }}
+
+        {{ form_widget(form.surname) }}
+    </div>
+
+   <div class="form-group">
         {{ form_row(form.save) }}
     </div>
 
@@ -133,22 +143,20 @@ So we could display our new student form this way:
     {% endblock %}
 ```
 
-The above would output the following HTML (if the errors list was empty):
+The above would output the following HTML for the `firstName` property (if the errors list was empty):
 
 ```html
 
-    <div>
-        <div class="errors">
+   <div class="form-group">
+    <div class="errors">
+        
+    </div>
 
-        </div>
+    <label for="student_firstName" class="required">First name</label>
 
-        <label for="form_name" class="required">Name</label>
-
-        <input type="text" id="form_name" name="form[name]" required="required" />
+    <input type="text" id="student_firstName" name="student[firstName]" required="required" class="form-control" />
     </div>
 ```
-
-NOTE: If we have the Bootstrap template, we need to use appropriate classes for our DIVs to get that nice form layout ...
 
 Learn more at:
 
