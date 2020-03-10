@@ -2,9 +2,9 @@
 # Customising view based on logged-in user
 
 
-## Twig nav links when logged in  (project `security09`)
+## Twig nav links when logged in  (project `security08`)
 
-The [Symfony security docs](http://symfony.com/doc/current/security.html#retrieving-the-user-in-a-template) give us the Twig code for a conditional statement for when the current user has logged in:
+The [Symfony security docs](https://symfony.com/doc/current/security.html#fetch-the-user-in-a-template) give us the Twig code for a conditional statement for when the current user has logged in:
 
 ```html
     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
@@ -37,9 +37,9 @@ First, let's add a `<header>` element to either show the username and a logout l
             Username:
             <strong>{{ app.user.username }}</strong>
             <br>
-            <a href="{{ url('logout') }}">logout</a>
+            <a href="{{ url('app_logout') }}">logout</a>
         {% else %}
-            <a href="{{ url('login') }}">login</a>
+            <a href="{{ url('app_login') }}">login</a>
         {% endif %}
     </header>
 ```
@@ -62,7 +62,7 @@ We can right align it and have a black bottom border with a little style in the 
             </style>
 ```
 
-Next, let's define a `<nav>` element, so that **all** users see a link to the homepage on every page on the website (at least those that extend `base.html.twig`). We will also add a conditinal navigation link - to that users logged-in with `ROLE_ADMIN` can also see a link to the admin home page:
+Next, let's define a `<nav>` element, so that **all** users see a link to the homepage on every page on the website (at least those that extend `base.html.twig`). We will also add a conditional navigation link - to that users logged-in with `ROLE_ADMIN` can also see a link to the admin home page:
 
 ```twig
     <nav>
@@ -73,7 +73,7 @@ Next, let's define a `<nav>` element, so that **all** users see a link to the ho
 
             {% if is_granted('ROLE_ADMIN') %}
                 <li>
-                    <a href="{{ url('admin_home') }}">admin home</a>
+                    <a href="{{ url('admin') }}">admin home</a>
                 </li>
             {% endif %}
         </ul>
@@ -109,5 +109,4 @@ or  you can type-hint in a controller method declaration, and the param converte
 
 see:
 
-- [https://symfony.com/doc/4.0/security.html#retrieving-the-user-object](https://symfony.com/doc/4.0/security.html#retrieving-the-user-object)
-
+- [https://symfony.com/doc/current/security.html#a-fetching-the-user-object](https://symfony.com/doc/current/security.html#a-fetching-the-user-object)

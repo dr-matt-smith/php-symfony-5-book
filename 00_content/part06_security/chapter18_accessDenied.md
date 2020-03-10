@@ -9,7 +9,7 @@ For details about this topic visit the Symfony documentation:
 - [https://symfony.com/doc/current/security/access_denied_handler.html](https://symfony.com/doc/current/security/access_denied_handler.html)
 
 
-## Declaring our handler  (project `security06`)
+## Declaring our handler  (project `security05`)
 
 In `/config/packages/security.yml` we need to declare that the class we'll write below will handle access denied exceptions.
 

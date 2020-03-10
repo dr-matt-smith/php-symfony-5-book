@@ -1,7 +1,7 @@
 
 # User roles and role hierarchies
 
-## Simplifying roles with a hierarchy (project `security08`)
+## Simplifying roles with a hierarchy (project `security07`)
 
 Let's avoid repeating roles in our program logic (e.g. IF `ROLE_USER` OR `ROLE_ADMIN`) by creating a hierarchy, so we can give `ROLE_ADMIN` all properties of `ROLE_USER` as well. We can easily create a role hierarchy in `/config/packages/security.yml`:
 
@@ -13,7 +13,7 @@ Let's avoid repeating roles in our program logic (e.g. IF `ROLE_USER` OR `ROLE_A
         ... rest of 'security.yml' as before ...
 ```
 
-In fact let's go one further - let's create a 3rd user role (`ROLE_SUPER_ADMIN`) and define that as having all `ROLE_ADMIN` privileges plus the ab
+In fact let's go one further - let's create a 3rd user role (`ROLE_SUPER_ADMIN`) and define that as having all `ROLE_ADMIN` privileges plus the `ROLE_USER` privileges that were inherited by `ROLE_ADMIN`:
 
 ```yaml
     security:
@@ -30,19 +30,16 @@ Now if we log in as a user with `ROLE_SUPER_ADMIN` we also get `ROLE_ADMIN` and 
 
 ## Modify fixtures
 
-Now we can modify our fixtures to make user `matt` have `ROLE_SUPER_ADMIN`.
+Now we can modify our fixtures to make user `matt` have just `ROLE_SUPER_ADMIN` - the other roles should be inherited through the hierarchy:
 
-Change `/src/DataFixtures/LoadUsers.php` as follows:
+Change `/src/DataFixtures/UserFixtures.php` as follows:
 
 ```php
         public function load(ObjectManager $manager)
         {
             ...
 
-            $userMatt = $this->createActiveUser(
-                'matt',
-                'smith',
-                ['ROLE_SUPER_ADMIN']);
+            $userMatt = $this->createUser('matt.smith@smith.com', 'smith', ['ROLE_SUPER_ADMIN']);
 
             ...
 ```
@@ -61,7 +58,7 @@ If we are using a hierarchy, we don't need always add `ROLE_USER` in code, so we
 
 We'll still see `ROLE_USER` for admin and super users, but in the list of **inherited** roles from the hierarchy. This is show in Figure \ref{role_inherited}.
 
-![Super admin user inheriting `ROLE_USER`. \label{role_inherited}](./03_figures/part06_security/12_inherited_roles.png){ width=50% }
+![Super admin user inheriting `ROLE_USER`. \label{role_inherited}](./03_figures/part06_security/12_inherited_roles.png)
 
 Learn about user role hierarchies at:
 

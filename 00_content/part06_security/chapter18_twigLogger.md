@@ -14,7 +14,7 @@ Learn more in the Symfony documentation:
 - [https://symfony.com/doc/current/components/dependency_injection.html](https://symfony.com/doc/current/components/dependency_injection.html)
 
 
-## Using Twig for access denied message (project `security07`)
+## Using Twig for access denied message (project `security06`)
 
 Let's improved our Access Denied exception handler in 2 ways:
 
@@ -70,7 +70,7 @@ Now we can re-write method `handle(...)` to log an error message, and
 
 ## The Twig page
 
-Create Twig error page `/templates/error/accessDenied.html.twig`:
+Create a new folder `error` in our `/templates` folder, and in that create new Twig template `accessDenied.html.twig` for our nicer looking error page:
 
 ```twig
     {% extends 'base.html.twig' %}
@@ -85,7 +85,7 @@ Create Twig error page `/templates/error/accessDenied.html.twig`:
     {% endblock %}
 ```
 
-See Figure \ref{denied_log} to see the error log register in the Symfony profiler footer, at the bottom of our custom error page.
+Now, login in as `user@user.com` and try to visit `/admin`. We should get that access denied exception again, since this user does not have the required `ROLE_ADMIN` role privilege.  See Figure \ref{denied_log} to see the error log register in the Symfony profiler footer, at the bottom of our custom error page.
 
 ![Screenshot of Custom Twig access denied page. \label{denied_log}](./03_figures/part06_security/9_twig_page.png){ width=75% }
 
@@ -93,6 +93,22 @@ See Figure \ref{denied_log} to see the error log register in the Symfony profile
 If you click on the red error you'll see details of all logged messages during the processing of this request.  See Figure \ref{profiler_log}.
 
 ![Screenshot of Profiler log entries. \label{profiler_log}](./03_figures/part06_security/10_logs_in_profiler.png){ width=75% }
+
+## Terminal log
+
+You'll also see a red highlighted error appear in the terminal window if you are serving this website project with the Symfony web server:
+
+```bash
+ [OK] Web server listening on https://127.0.0.1:8000 (PHP FPM 7.3.8)                                                    
+
+    Mar 10 17:11:55 |WARN | SERVER GET  (403) /admin ip="127.0.0.1"
+    Mar 10 18:11:54 |INFO | REQUES Matched route "admin". method="GET" request_uri="https://127.0.0.1:8000/admin" route="admin" route_parameters={"_controller":"App\\Controller\\AdminController::index","_route":"admin"}
+    Mar 10 18:11:55 |DEBUG| SECURI Checking for guard authentication credentials. authenticators=1 firewall_key="main"
+        ... a bunch more DEBUG logs ....
+    Mar 10 18:11:55 |DEBUG| SECURI Access denied, the user is neither anonymous, nor remember-me. 
+
+    Mar 10 18:11:55 |ERROR| APP    access denied exception  <<<<<< here is our acess denied logged error in the terminal 
+```
 
 ## Learn more about logger and exceptions
 
