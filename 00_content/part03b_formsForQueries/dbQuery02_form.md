@@ -6,7 +6,7 @@ Searching by having to type values in the URL isn't ideal. So let's add an HTML 
 
 ![Form to search for category. \label{query6}](./03_figures/part03/q6_simpleForm.png){width=80%}
 
-## The form in Twig templat
+## The form in Twig template
 
 Let's write the HTML code for the submission form for the Products list Twig template in `/templates/product/index.html.twig`.
 
@@ -160,3 +160,124 @@ If we no longer wanted the URL search route, we could replace the final statemen
         return $this->render($template, $args);
     }
 ```
+
+# Wildcard vs. exact match queries
+
+## Search Form for partial description match (project `query03`)
+
+Let's add a query form in the **description** column, so we need to edit Twig template  `/templates/product/index.html.twig`.
+
+So we add a new search form in the second table header row, for internal route name `search_description`, and passing form variable `keyword`:
+
+```twig
+    <tr>
+        <th></th>
+        <th>
+            <form action="{{ url('search_description') }}" method="post">
+                <input name="keyword">
+                <input type="submit">
+            </form>
+        </th>
+        <th></th>
+        <th>
+            <form action="{{ url('search_category') }}" method="post">
+                <input name="category">
+                <input type="submit">
+            </form>
+        </th>
+        <th></th>
+    </tr>
+```
+
+Let's write the controller method to process our keyword form submission - edit `/src/ProductController.php` and add a new method:
+
+```php
+    /**
+     * @Route("/searchDescription", name="search_description", methods={"POST"})
+     */
+    public function searchDescription(Request $request): Response
+    {
+        $keyword = $request->request->get('keyword');
+
+        if(empty($keyword)){
+            return $this->redirectToRoute('product_index');
+        }
+
+        // if get here, not empty - so use value to search...
+        $productRepository = $this->getDoctrine()->getRepository('App:Product');
+        $products =  $productRepository->findByDescription($keyword);
+
+        $template = 'product/index.html.twig';
+        $args = [
+            'products' => $products,
+            'keyword' => $keyword
+        ];
+
+        return $this->render($template, $args);
+    }
+```
+
+The above is just like our category search - but does only work for an exact match of `keyword` with the value of the `description` property.
+
+What we want is to implement something similar the SQL `LIKE "%wildcard%"` query, where a word **anywhere** in the text of the `description` property will be matched. 
+
+## Customer queries in our Repository class
+
+The solution is to write a custom query method `findByLikeDescription($keyword)` in our `ProductRepository` class as follows:
+
+```php
+    ...
+
+    class ProductRepository extends ServiceEntityRepository
+    {
+        ...
+
+        /**
+         * @return Product[] Returns an array of Drill objects
+         */
+        public function findByLikeDescription($keyword)
+        {
+            return $this->createQueryBuilder('p')
+                ->andWhere('p.description LIKE :keyword')
+                ->setParameter('keyword', "%$keyword%")
+                ->getQuery()
+                ->getResult()
+                ;
+        }
+    }
+```
+
+We can now use this method in our `ProductController` controller method `searchDescription(..)`:
+
+```php
+    // if get here, not empty - so use value to search...
+    $productRepository = $this->getDoctrine()->getRepository('App:Product');
+
+    $products =  $productRepository->findByLikeDescription($keyword);
+```
+
+See Figure \ref{query7} illustrates a wildcard search for any `Product` with description containing texgt `bag`.
+    
+![Form to wildcard search for description. \label{query7}](./03_figures/part03/q7_likeDescription.png){width=80%}
+
+## Making wildcard a **sticky** form
+
+You may have noticed that in `ProductController` method `searchDescription(...)` we are passing the value of `$keyword` as well as the array `$products` to our Twig template. 
+
+This means that when the Product index page is called from our search method there will be an extra Twig variable `keyword` defined, which we can detect and use as a default value for our search form - so the user can **see** the wildcard value for which we are seeing a list of products:
+
+```twig
+    <form action="{{ url('search_description') }}" method="post">
+        <input name="keyword"
+               {% if keyword is defined %}
+               value="{{ keyword }}"
+               {% endif %}
+        >
+        <input type="submit">
+    </form>
+```
+
+If there is no `keyword` Twig variable (it is not defined), then we don't add a `value` attribute to this form input.
+
+NOTE: There is a difference between a variable existing and containing `NULL` versus no such variable being defined at all - ensure you write the correct test in Twig to distinguish between these differences...
+
