@@ -2,17 +2,15 @@
 # Acceptance Tests
 
 
-## Test for `home page` text at `/` (project `codeception03`)
+## Test for `home page` text at `/` (project `codeception02`)
 
 The project we started with (`security09`) has a simple public home page template:
 
 ```twig
     {% extends 'base.html.twig' %}
     
-    {% block title %}home page {% endblock %}
-    
     {% block body %}
-    <h1>home page</h1>
+        welcome to the home page
     {% endblock %}
 ```
 
@@ -54,7 +52,7 @@ So let's generate an **acceptance** test to simulate a user visiting `/` and see
            public function homePageContent(AcceptanceTester $I)
            {
                $I->amOnPage('/');
-               $I->see('home page');
+               $I->see('welcome to the home page');
            }
        }
     ```
@@ -63,7 +61,7 @@ There are 2 steps to our home page acceptance test;
 
 1. Make the browser open URL `/`
 
-1. Assert that somewhere in the text contents of the HTTP Response from the server is the text `home page`
+1. Assert that somewhere in the text contents of the HTTP Response from the server is the text `welcome to the home page`
 
 ## Run the test (fail - server not running)
 
@@ -94,7 +92,7 @@ The error details tell us that the connection was refuse to localhost port 8000.
 
 ## Run the test (pass, when server running)
 
-Now run the Symfony server in a CLI terminal window with `php bin/console server:run`, and in a second CLI window run the Codeception tests again. This time it should pass:
+Now run the Symfony server in a CLI terminal window with `symfony serve`, and in a second CLI window run the Codeception tests again. This time it should pass:
 
 ```bash
           Testing App\Tests.acceptance
@@ -103,9 +101,9 @@ Now run the Symfony server in a CLI terminal window with `php bin/console server
 
 ## From red to green
 
-There is an `about` page in this project:
+Let's add an `about` page in this project:
 
-- our `DefaultController` class defines this route:
+- in our DefaultController class `/src/Controller/DefaultController.php`  we can define this route:
 
     ```php
           /**
@@ -120,15 +118,16 @@ There is an `about` page in this project:
           }
     ```
     
-- and there is this Twig template
+- and we can create Twig template `/templates/default/about.html.twig`:
 
     ```twig
       {% extends 'base.html.twig' %}
-      
-      {% block title %}about page {% endblock %}
-      
+            
       {% block body %}
-      <h1>about page page</h1>
+      <h1>about page</h1>
+      <p>
+      Welcome to the about page
+      </p>
       {% endblock %}
     ```
     
@@ -184,19 +183,20 @@ Add a link to the about page in the base Twig template `templates/base.html.twig
             <li>
                 <a href="{{ url('about') }}">about</a>
             </li>
-            <li>
-                <a href="{{ url('student_index') }}">student home</a>
-            </li>
-            <li>
-                <a href="{{ url('admin_index') }}">admin home</a>
-            </li>
+            {% if is_granted('ROLE_ADMIN') %}
+                <li>
+                    <a href="{{ url('admin') }}">admin home</a>
+                </li>
+            {% endif %}
         </ul>
     </nav>
 ```
 
+Clear the **cache** - e.g. just delete folder `/var/cache`, and run Codeception again.
+
 Now all tests should pass when we run Codeception.
 
-## Annotation style data provider to test multiple data
+## Annotation style data provider to test multiple data (project `codeception03`)
 
 Let's use the Codeception Doctrine-style Annotation data provider, to test:
 
@@ -222,13 +222,13 @@ Replace the skeleton with the following:
     class NavbarCest
     {
         /**
-         * @example(url="/", text="home page")
-         * @example(url="/about", text="about page")
+         * @example(url="/", heading="Home page")
+         * @example(url="/about", heading="About page")
          */
         public function staticPageContent(AcceptanceTester $I, Example $example)
         {
             $I->amOnPage($example['url']);
-            $I->see($example['text']);
+            $I->see($example['heading'], 'h1');
         }
     
         /**
@@ -248,11 +248,11 @@ Replace the skeleton with the following:
 We see that we are using the `Codeception\Example` class, which allows us to write `@example` annotations (note lower case `e`):
 
 ```php
-     * @example(url="/", text="home page")
-     * @example(url="/about", text="about page")
+    * @example(url="/", heading="Home page")
+    * @example(url="/about", heading="About page")
 ```
 
-Method `staticPageContent()` makes use of our custom example values `url` and `text` (we can name them what we want, and have as many as we wish). The example data is provided to the testing method as an associated map array. Each URL is visited, then an assertion is made that we see the provided text on the visited page `$I->see($example['text'])`.
+Method `staticPageContent()` makes use of our custom example values `url` and `heading` (we can name them what we want, and have as many as we wish). The example data is provided to the testing method as an associated map array. Each URL is visited, then an assertion is made that we see the provided level 1 heading text on the visited page `$I->see($example['hading'], 'h1')`.
 
 
 Method `staticPageLinks()` makes use of our custom example values `url` and `link`. We start on the home page, attempt to click a link wrapped around the text of the provided link `$I->click($example['link'])`, and then check the the provided URL is in the browser address bar having clicked the link.
@@ -274,18 +274,24 @@ If you prefer the more traditional Data Provided syntax, you can lean about that
 
 Here are the more common Codeception assertions for Acceptance tests:
 
-- see / not see text in page
+- see / not see text in page (anywhere in HTML received by browser - could be in the `<head>` so not see by user)
 
     - `$I->see(<text in page>)`
 
     - `$I->dontsee(<text in page>)` - text is **NOT** present (e.g. not see 'invalid login')
 
+- see / not see text in page in a specific CSS selector:
 
-- see a link
+    - `$I->see(<text in page>, '<selector>)`
+
+    - `$I->dontsee(<text in page>, '<selector>')` - text is **NOT** present (e.g. not see paragraph after valid login: `dontsee('invalid login', 'p')`
+
+
+- see this text as a link
 
     - `$I->seeLink('login');`
 
-- click a link
+- click a text link
 
     - `$I->click('login');`
 

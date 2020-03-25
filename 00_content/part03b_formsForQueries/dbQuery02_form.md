@@ -221,7 +221,7 @@ The above is just like our category search - but does only work for an exact mat
 
 What we want is to implement something similar the SQL `LIKE "%wildcard%"` query, where a word **anywhere** in the text of the `description` property will be matched. 
 
-## Customer queries in our Repository class
+## Custom queries in our Repository class
 
 The solution is to write a custom query method `findByLikeDescription($keyword)` in our `ProductRepository` class as follows:
 

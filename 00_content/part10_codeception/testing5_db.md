@@ -8,7 +8,7 @@ Let's configure Codeception to use Doctrine for DB work, and to recognise Symfon
 
 Note - by stating `cleanup:true` for the Doctrine2 module, we are asking Codeception to create a database **transaction** before each test runs, and then to roll-back the translation after the test runs. So the database should be in the same state **after** each test as it was **before**. Thus, our tests are not linked and do not rely on running in a set sequence.
 
-We need to edit file `/tests/acceptqance.yml.suite` to add the following:
+We need to edit file `/tests/acceptance.yml.suite` to add the following:
 
 ```yaml
     - Symfony:
@@ -40,6 +40,12 @@ So it should now contain:
 
 ## Test Users in DB from Fixtures
 
+To work with databases we need to add the Doctrine Codeception module:
+
+```bash
+    composer req codeception/module-doctrine2 --dev 
+```
+
 Generate a new Acceptance test `UserCest`:
 
 ```bash
@@ -49,64 +55,103 @@ codecept g:cest acceptance UserCest
 Edit this new file `/tests/acceptance/UserCest.php` to contain the following:
 
 ```php
-    <?php 
-    namespace App\Tests;
+    <?php namespace App\Tests;
     use App\Tests\AcceptanceTester;
     
     class UserCest
     {
-    
         public function testUsersInDb(AcceptanceTester $I)
         {
             $I->seeInRepository('App\Entity\User', [
-                'username' => 'user'
+                'email' => 'user@user.com'
             ]);
             $I->seeInRepository('App\Entity\User', [
-                'username' => 'admin'
+                'email' => 'admin@admin.com'
             ]);
             $I->seeInRepository('App\Entity\User', [
-                'username' => 'matt'
+                'email' => 'matt.smith@smith.com'
             ]);
-    
         }
     }
 ```
 
+NOTE: If we had created a Security `User` entity using `username` for login rather than `email` we'd write something like this to test for them in the DB:
+
+```php
+    public function testUsersInDb(AcceptanceTester $I)
+    {
+        $I->seeInRepository('App\Entity\User', [
+            'username' => 'user'
+        ]);
+        $I->seeInRepository('App\Entity\User', [
+            'username' => 'admin'
+        ]);
+        $I->seeInRepository('App\Entity\User', [
+            'username' => 'matt'
+        ]);
+```
+
 When you run the test should pass (assuming these users are in the DB from the Fixtures setup).
+
+And, of course, we could tidy this up using data providers as in a previous chapter ...
 
 ## Check DB reset after each test
 
-Add 2 more test methods, one to create a new user, and test it exists, and then one to check that that new user was removed when its test finished runing:
+The `AcceptanceTester` method `haveInRepository(...)` INSERTS an object into the database for testing. This is to be distinguished from the very similarly named `seeInRepository(...)` which tests whether an object already EXISTS in the database.
+
+Add 2 more test methods, one to create a new user, and test it exists, and then one to check that that new user was removed when its test finished running:
 
 ```php
     
     public function testAddToDatabase(AcceptanceTester $I)
     {
+        // INSERT new user `userTemp@temp.com` into the User table 
         $I->haveInRepository('App\Entity\User', [
-            'username' => 'userTEMP',
-            'password' => 'sdf',
+            'email' => 'userTemp@temp.com',
+            'password' => 'simplepassword',
             'roles' => ['ROLE_USER']
         ]);
 
+        // test whether user `userTemp@temp.com`  can be FOUND in the table
         $I->seeInRepository('App\Entity\User', [
-            'username' => 'userTEMP'
+            'email' => 'userTemp@temp.com',
         ]);
     }
 
     public function testTEMPNoLongerInDatabase(AcceptanceTester $I)
     {
-
+        // since we are RESETTING db after each test, the temporary user should NOT still be in the repository...
         $I->dontSeeInRepository('App\Entity\User', [
-            'username' => 'userTEMP'
+            'email' => 'userTemp@temp.com',
         ]);
     }
 ```
 
-## Add DB counts to our form-filling Acceptance test
+## Counting items retrieved from DB (project `codeception06`)
 
-Let's add code to count number of recipes int he DB before and after filling in the form to cfreatge a new recipe.
+Let's add a new method to our `/tests/acceptance/RecipeCest.php` Recipe test class, one that counts the Recipe objects retrieved from the database, which should be ZERO, since at present we have no Fixtures for Recipes:
 
-First, let's ensure there is one recipe in the data through a fixture:
+```php
+    public function countRecipesBeforeChanges(AcceptanceTester $I)
+    {
+        // --- expect 0 in DB from fixtures
+        // arrange
+        $expectedCount = 0;
+    
+        // act
+        $recipes = $I->grabEntitiesFromRepository('App\Entity\Recipe');
+        $numRecipes = count($recipes);
+    
+        // assert
+        $I->assertEquals($expectedCount, $numRecipes);
+    }
+```
+
+This will succeed when we run Codeception. The key to DB counting is the AcceptanceTester method `grabEntitiesFromRepository(<EntityClass>)`. This method returns an array of Entity objects, just as we'd get from invoking `findAll()` with a reference to a Repository object in a normal controller method.
+
+## Create a Recipe fixture
+
+Now let's ensure there is one recipe in the data through a fixture:
 
 ```php
     namespace App\DataFixtures;
@@ -122,7 +167,7 @@ First, let's ensure there is one recipe in the data through a fixture:
         {
              $recipe = new Recipe();
              $recipe->setTitle('Boston Cheesecake');
-             $recipe->setSteps('open packge - follow instructions');
+             $recipe->setSteps('open package - follow instructions');
              $recipe->setTime(120);
     
              $manager->persist($recipe);
@@ -134,103 +179,77 @@ First, let's ensure there is one recipe in the data through a fixture:
 
 And load the fixtures via the Symfony console Doctrine command.
 
-Now we can add to our Recipe form-filling acceptance test to count 1 recipe initially, then 2 after the new one has been created by filling in the form:
+NOTE:
+
+- if your Fixture class does not load, clear the cache (e.g. delete folder `/var/cache` and try again ...)
+
+We would now have to refactor our DB counting test to expect 1 Recipe.
+
+## Comparing Repository counts BEFORE and AFTER DB actions
+
+Now we can add to our Recipe form-filling acceptance test to count 1 recipe initially, then 2 after the new one has been created by filling in the form. However, rather than hard code these numbers, we can retrieve the count **before** the insert actions, and the count **after** the action, and **assert** that the count after is expected to be 1 + the count before:
 
 ```php
-    public function tryToTest(AcceptanceTester $I)
+    public function countOneMoreAfterCreate(AcceptanceTester $I)
     {
-        // --- expect 1 in DB from fixturs
-        $expectedCount = 1;
-        $users = $I->grabEntitiesFromRepository('App\Entity\Recipe');
-        $numRecipes = count($users);
+        $recipes = $I->grabEntitiesFromRepository('App\Entity\Recipe');
+        $countbeforeInsert = count($recipes);
 
-        // assert
-        $I->assertEquals($expectedCount, $numRecipes);
+        $I->amOnPage('/recipe/new');
+        $I->fillField('#recipe_title', 'Boston Cheesecake');
+        $I->fillField('#recipe_steps', 'buy packet - follow instructions');
+        $I->fillField('#recipe_time', 60);
 
+        $I->click('Save');
+
+        $recipes = $I->grabEntitiesFromRepository('App\Entity\Recipe');
+        $countAfterInsert = count($recipes);
+
+        $I->assertEquals($countAfterInsert, (1 + $countbeforeInsert));
+    }
+```
+
+## Testing properties of items added to the database 
+
+In additional to counting DB rows, we can also use the `seeInRepository(...)` method to confirm that an object exists in the DB matching the values entered in the form. Rather than hardcoding such values (since we should not guess what values any Fixtures have), we can create a more unique value to test by concatenating random numbers to values.
+
+So below we create a random number from 1..00 (`$randomNumber = rand(1,100)`), and append this to the end of the String `Boston Cheesecake`:
+
+```php
+    // --- create new recipe via FORM
+    // title suffix RANDOM numbner: 'Boston Cheesecake<randNum>'
+    $randomNumber = rand(1,100);
+    $recipeTitle = 'Boston Cheesecake' . $randomNumber;
+```
+
+We can then test for an item in the DB by writing the assertion:
+
+```php
+    // ---- check added to repository
+    $I->seeInRepository('App\Entity\Recipe', [
+        'title' => $recipeTitle
+    ]);
+```
+
+```php
+    public function testRandomInsertedStringAddedToDb(AcceptanceTester $I)
+    {
+        // (1) Arrange
         // --- create new recipe via FORM
         // title suffix RANDOM numbner: 'Boston Cheesecake<randNum>'
         $randomNumber = rand(1,100);
-        $recipeTitle = 'Boston Cheesecake' . $randomNumber;
+        $recipeTitleRandom = 'Boston Cheesecake' . $randomNumber;
 
+        // (2) Act
         $I->amOnPage('/recipe/new');
-        $I->fillField('#recipe_title', $recipeTitle);
+        $I->fillField('#recipe_title', $recipeTitleRandom);
         $I->fillField('#recipe_steps', 'buy packet - follow instructions');
         $I->fillField('#recipe_time', 60);
         $I->click('Save');
 
-        // ---- check added to repository
+        // (3) Assert
         $I->seeInRepository('App\Entity\Recipe', [
-            'title' => $recipeTitle
+            'title' => $recipeTitleRandom
         ]);
-
-
-        // --- now should be 2 in DB
-        $expectedCount = 2;
-        $users = $I->grabEntitiesFromRepository('App\Entity\Recipe');
-        $numRecipes = count($users);
-
-        // assert
-        $I->assertEquals($expectedCount, $numRecipes);
     }
 ```
-
-<!--
-## Setup database
-
-using Doctrine and Symfony
-
-https://codeception.com/docs/05-UnitTests#Interacting-with-the-Framework
-
-
-In this case you can use the methods from the Doctrine2 module, while Doctrine itself uses the Symfony module to establish connections to the database. In this case a test might look like:
-
-<?php
-function testUserNameCanBeChanged()
-{
-    // create a user from framework, user will be deleted after the test
-    $id = $this->tester->haveInRepository(User::class, ['name' => 'miles']);
-    
-    // get entity manager by accessing module
-    $em = $this->getModule('Doctrine2')->em;
-
-    // get real user
-    $user = $em->find(User::class, $id);
-    $user->setName('bill');
-    $em->persist($user);
-    $em->flush();
-    $this->assertEquals('bill', $user->getName());
-
-    // verify data was saved using framework methods
-    $this->tester->seeInRepository(User::class, ['name' => 'bill']);
-    $this->tester->dontSeeInRepository(User::class, ['name' => 'miles']);
-}
-
-In both examples you should not be worried about the data persistence between tests. The Doctrine2 and Laravel5 modules will clean up the created data at the end of a test. This is done by wrapping each test in a transaction and rolling it back afterwards.
-
-
-
-## Faker
-
-1. Generate a `Helper` class:
-
-    ```bash
-         vendor/bin/codecept generate:helper Factories
-    ```
-
-    - this should create `tests/_support/Helper/Factories.php `    
-    
-1. Installt the Faker **Facade**:
-
-
-
-    ```bash
-        composer req league/factory-muffin-faker
-    ```
-    
-    
-1. Install version 2.1 of the PHP League `FactoryMuffin`:
-
-    ```bash
-        composer req league/factory-muffin
-    ```
--->
