@@ -133,7 +133,7 @@ So we can simply write the following to ask Symfony to generate an HTTP response
         }
 ```
 
-Now let's put our own personal content in that Twig template in `/templates/default/homepage.html.twig`!
+Now let's put our own personal content in that Twig template in `/templates/default/index.html.twig`!
 
 - Replace the contents of file `index.html.twig` with the following:
 

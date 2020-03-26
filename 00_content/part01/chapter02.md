@@ -149,13 +149,29 @@ Look inside the generated class `/src/Controller/DefaultController.php`. It shou
 
 ```
 
-This default controller uses a **Twig** template to return an HTML page. 
+This default controller uses a **Twig** template to return an HTML page:
 
-```json
-    {
-        "message":"Welcome to your new controller!",
-        "path":"src\/Controller\/DefaultController.php",
-    }
+```twig
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello FredController!{% endblock %}
+
+{% block body %}
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    <h1>Hello {{ controller_name }}! ✅</h1>
+
+    This friendly message is coming from:
+    <ul>
+        <li>Your controller at <code><a href="{{ '/Users/matt/Documents/Books/php-symfony-5-book-codes-temp/___1_testing/php-symfony-5-book-codes-codeception-03-data-provider/src/Controller/FredController.php'|file_link(0) }}">src/Controller/FredController.php</a></code></li>
+        <li>Your template at <code><a href="{{ '/Users/matt/Documents/Books/php-symfony-5-book-codes-temp/___1_testing/php-symfony-5-book-codes-codeception-03-data-provider/templates/fred/index.html.twig'|file_link(0) }}">templates/fred/index.html.twig</a></code></li>
+    </ul>
+</div>
+{% endblock %}
 ```
 
 Let's 'make this our own' by changing the contents of the Response returned to a simple text response. Do the following:
