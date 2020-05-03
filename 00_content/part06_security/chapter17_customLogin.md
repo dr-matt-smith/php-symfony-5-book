@@ -67,6 +67,10 @@ Learn more about CSRF threats and security:
 - [Symfony CSRF protection](https://symfony.com/doc/current/security/csrf.html)
 - [Wikipedia](https://en.wikipedia.org/wiki/Cross-site_request_forgery#Forging_login_requests)
 
+- [article on DIY CSRF for PHP](https://www.netsparker.com/blog/web-security/protecting-website-using-anti-csrf-token/)
+- [Stack Overlow about PHP CSRF](https://stackoverflow.com/questions/6287903/how-to-properly-add-cross-site-request-forgery-csrf-token-using-php)
+
+
 When using the Symfony generated login form (as we created in this chapter) the CSRF token protection is built-in automatically.
 
 
