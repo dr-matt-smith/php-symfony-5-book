@@ -1,1 +1,1 @@
-An Introduction to Symfony 5 &copy; Matt Smith 2020
+An Introduction to Symfony 5 &copy; Matt Smith 2021

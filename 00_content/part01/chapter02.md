@@ -163,7 +163,7 @@ This default controller uses a **Twig** template to return an HTML page:
 </style>
 
 <div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    <h1>Hello {{ controller_name }}! [TICK ICON]</h1>
 
     This friendly message is coming from:
     <ul>

@@ -20,7 +20,7 @@
         
         \vfill
   
-            \copyright ~ 2020
+            \copyright ~ 2021
 
      \end{center}
     \thispagestyle{empty}

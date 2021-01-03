@@ -87,7 +87,7 @@ NOTE: You'll see some Fortrabbit output when it responds to the new commit to th
         
         Commit received, starting build of branch master
         
-        –––––––––––––––––––––––  ∙ƒ  –––––––––––––––––––––––
+        –––––––––––––––––––––––  ƒ  –––––––––––––––––––––––
         
         B U I L D
         Checksum:
@@ -140,7 +140,7 @@ NOTE: You'll see some Fortrabbit output when it responds to the new commit to th
         
         Build & release done in 14s 863ms, now queued for final distribution.
         
-        –––––––––––––––––––––––  ∙ƒ  –––––––––––––––––––––––
+        –––––––––––––––––––––––  ƒ  –––––––––––––––––––––––
         
         To deploy.eu2.frbit.com:symfony-demo.git
          * [new branch]      master -> master 
