@@ -36,7 +36,7 @@ Rather than put all the work in the `load(...)` method, we can create a helper m
         $user->setRoles($roles);
 
         // password - and encoding
-        $encodedPassword = $this->encodePassword($user, $plainPassword);
+        $encodedPassword = $this->passwordEncoder->encodePassword($user, $plainPassword);
         $user->setPassword($encodedPassword);
 
         return $user;
