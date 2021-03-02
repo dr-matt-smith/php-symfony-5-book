@@ -22,7 +22,7 @@ The solution is pretty straightforward:
 
 1. add a new String `role` property to the `User` entity
 
-    - HINT: use `make:crud User` and add the new property
+    - HINT: use `make:entity User` and add the new property
     
 1. change the `getRoles()` method to simply return the string `role` wrapped in an array:
 
