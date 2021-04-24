@@ -225,3 +225,4 @@ Figure \ref{fake_students} shows a screenshot of the DB client showing the 10 cr
 Learn more about the `Faker` class at its Github project page:
 
 - [https://github.com/fzaninotto/Faker](https://github.com/fzaninotto/Faker)
+
