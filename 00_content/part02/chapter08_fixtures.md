@@ -226,3 +226,17 @@ Learn more about the `Faker` class at its Github project page:
 
 - [https://github.com/fzaninotto/Faker](https://github.com/fzaninotto/Faker)
 
+
+## Foundry and FakerPHP
+
+Learn more about fixtures packages at Symfonycasts:
+
+- Foundry
+
+  - [https://symfonycasts.com/screencast/symfony-doctrine/foundry](https://symfonycasts.com/screencast/symfony-doctrine/foundry)
+
+- FakerPHP
+
+   - [https://symfonycasts.com/screencast/symfony-doctrine/foundry-tricks#play](https://symfonycasts.com/screencast/symfony-doctrine/foundry-tricks#play)
+
+
