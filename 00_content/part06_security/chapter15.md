@@ -1,6 +1,26 @@
 
 # Quickstart Symfony security
 
+NOTE:NOTE:NOTE:
+NOTE:NOTE:NOTE:
+NOTE:NOTE:NOTE:
+NOTE:NOTE:NOTE:
+NOTE:NOTE:NOTE:
+NOTE:NOTE:NOTE:
+NOTE:NOTE:NOTE:
+NOTE:NOTE:NOTE:
+NOTE:NOTE:NOTE:
+NOTE:NOTE:NOTE:
+NOTE:NOTE:NOTE:
+
+New Symfony authenticator "passports"
+see Symfonycasts videos:
+
+https://symfonycasts.com/screencast/symfony-security/password-credentials
+
+https://symfonycasts.com/screencast/symfony-security/csrf-token
+
+
 ## Learn about Symfony security
 
 There are several key Symfony reference pages to read when starting with security. These include:
